@@ -1,0 +1,10 @@
+# Folder
+extra/
+tests/
+wip/
+
+
+# Entensions
+*.pyc
+*.pur
+*.ini
