@@ -90,24 +90,17 @@ class ImageConverter():
     def get_files(self):
         self.file_paths = filedialog.askopenfilenames(
             title='Select files')
-        """ if self.file_paths:
-            messagebox.showinfo(
-                'Files Selected',
-                f'{len(self.file_paths)} files selected') """
         return self.file_paths
 
 
     def convert_exr_to_jpg(self, exr_path, remove_original=False):
-        # Read the .exr file using OpenEXR
         file = OpenEXR.InputFile(exr_path)
         dw = file.header()['dataWindow']
         size = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
 
-        # Check available channel in the EXR file
         channels = file.header()['channels'].keys()
         required_channels = ['R', 'G', 'B']
 
-        # Read the RGB channels
         rgb = []
         pt = Imath.PixelType(Imath.PixelType.FLOAT)
         for color in required_channels:
@@ -119,11 +112,9 @@ class ImageConverter():
             rgb.append(channel_data)
         r, g, b = [im.reshape(size) for im in rgb]
 
-        # Stack and normalize the image
         img = np.stack([r, g, b], axis=-1)
         img = np.clip(img * 255, 0, 255).astype(np.uint8)
 
-        # Save the image as .jpg using PIL
         jpg_path = os.path.splitext(exr_path)[0] + '.jpg'
         img = Image.fromarray(img)
         img.save(jpg_path, 'JPEG')
@@ -161,8 +152,6 @@ class ImageConverter():
     def run(self):
         source_type = self.conversion_type.get()
         remove_original = self.remove_var.get()
-        #img_files = self.get_files()
-        #exr_files = self.get_exr_files()
 
         if not self.file_paths:
             messagebox.showwarning(
