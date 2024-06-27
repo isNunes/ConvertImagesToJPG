@@ -1,3 +1,5 @@
+![converter_ui](https://github.com/isNunes/ConvertImagesToJPG/assets/139524834/8aca746b-e93e-40e1-899b-5ab765184b05)
+
 # DESCRIPTION
 
 This Python script provides a user-friendly graphical interface
