@@ -1,4 +1,4 @@
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import tkinter as tk
 import os
 import sys
@@ -26,24 +26,67 @@ except ImportError:
 
 class ImageConverter():
     def __init__(self) -> None:
-        pass
+        self.root = tk.Tk()
+        self.root.title('Image Converter')
+        self.file_paths = []
+
+        self.create_widgets()
+
+
+    def create_widgets(self):
+        self.label = tk.Label(
+            self.root,
+            text='Select Files to Convert:')
+        self.label.pack(pady=10)
+
+        self.select_button = tk.Button(
+            self.root,
+            text='Select Files:',
+            command=self.get_files)
+        self.select_button.pack(pady=5)
+
+        self.convert_label = tk.Label(
+            self.root,
+            text="Select conversion type:'")
+        self.convert_label.pack(pady=10)
+
+        self.conversion_type = tk.StringVar(value='exr')
+        self.exr_radio = tk.Radiobutton(
+            self.root,
+            text='EXR to JPG',
+            variable=self.conversion_type,
+            value='exr')
+        self.exr_radio.pack(pady=2)
+
+        self.tif_radio = tk.Radiobutton(
+            self.root,
+            text='TIF to JPG',
+            variable=self.conversion_type,
+            value='tif')
+        self.tif_radio.pack(pady=2)
+
+        self.remove_var = tk.BooleanVar()
+        self.remove_check = tk.Checkbutton(
+            self.root,
+            text='Remove Original Files',
+            variable=self.remove_var)
+        self.remove_check.pack(pady=10)
+
+        self.convert_button = tk.Button(
+            self.root,
+            text='Convert',
+            command=self.run)
+        self.convert_button.pack(pady=20)
 
 
     def get_files(self):
-        root = tk.Tk()
-        root.withdraw() # Hide the main window
-        file_paths = filedialog.askopenfilenames(
+        self.file_paths = filedialog.askopenfilenames(
             title='Select files')
-        return file_paths
-
-
-    def get_exr_files(self):
-        root = tk.Tk()
-        root.withdraw() # Hide the main window
-        file_paths = filedialog.askopenfilenames(
-            title='Select EXR files',
-            filetypes=[('EXR Files', '*.exr')])
-        return file_paths
+        """ if self.file_paths:
+            messagebox.showinfo(
+                'Files Selected',
+                f'{len(self.file_paths)} files selected') """
+        return self.file_paths
 
 
     def convert_exr_to_jpg(self, exr_path, remove_original=False):
@@ -107,22 +150,28 @@ class ImageConverter():
         return packages
 
 
-    def run(self, source_type='exr', remove_original=False):
-        img_files = self.get_files()
+    def run(self):
+        source_type = self.conversion_type.get()
+        remove_original = self.remove_var.get()
+        #img_files = self.get_files()
         #exr_files = self.get_exr_files()
-        if img_files:
-            print(f'\n Converting images:')
-            for file in img_files:
-                if source_type == 'exr':
-                    self.convert_exr_to_jpg(
-                            file, remove_original=remove_original)
-                elif source_type == 'tif':
-                    self.convert_tif_to_jpg(
-                            file, remove_original=remove_original)
-            print('\n')
+
+        if not self.file_paths:
+            messagebox.showwarning(
+                'No files selected. Please select files to convert.')
+
+        print(f'\n Converting images:')
+        for file in self.file_paths:
+            if source_type == 'exr':
+                self.convert_exr_to_jpg(
+                        file, remove_original=remove_original)
+            elif source_type == 'tif':
+                self.convert_tif_to_jpg(
+                        file, remove_original=remove_original)
+        messagebox.showinfo('\nConversion Complete\n')
         self.uninstall_dependencies()
 
 
 if __name__ == '__main__':
     cvtr = ImageConverter()
-    cvtr.run(source_type='tif', remove_original=True)
+    cvtr.root.mainloop()
